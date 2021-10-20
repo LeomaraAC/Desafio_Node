@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
     const sql = `INSERT INTO people(nome) VALUES (?)`
     connection.query(sql, nome)
     let html = `
-        <h1> Full Cycle </h1>
+        <h1> Full Cycle Rocks! </h1>
         <br>
         <ul>
     `
