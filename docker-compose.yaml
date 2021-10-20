@@ -1,0 +1,44 @@
+version: '3.9'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./configs/node/Dockerfile
+    container_name: app
+    restart: always
+    depends_on:
+      - db
+    entrypoint: dockerize -wait tcp://db:3306 --timeout 60s node index.js
+    networks:
+      - desafio_node
+    tty: true
+
+  nginx:
+    build:
+      context: ./configs/nginx
+    container_name: nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "8080:8080"
+    networks:
+      - desafio_node
+
+  db:
+    image: mysql:5.7
+    container_name: db
+    restart: always
+    tty: true
+    command: --innodb-use-native-aio=0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./configs/mysql/database.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./configs/mysql/database:/var/lib/mysql
+    networks:
+      - desafio_node
+
+networks:
+  desafio_node:
+    driver: bridge
